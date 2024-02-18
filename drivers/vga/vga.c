@@ -1,5 +1,5 @@
-#include "port.h"
 #include "vga.h"
+#include "../port.h"
 
 char* const video_memory = (char*) 0xb8000;
 

@@ -1,5 +1,5 @@
 #include "uart.h"
-#include "port.h"
+#include "../port.h"
 
 static int uart;
 
@@ -7,7 +7,7 @@ enum {
     COM1 = 0x3f8,
 };
 
-void uartinit() {
+void uart_init() {
     // Turn off the FIFO
     port_byte_out(COM1+2, 0);
 
@@ -31,7 +31,7 @@ void uartinit() {
 }
 
 void
-uartputc(char c)
+uart_putc(char c)
 {
     int i;
 
