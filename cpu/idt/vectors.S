@@ -8,7 +8,7 @@ init_interrupt_handler:
 	pushl %gs
 	pushal
 
-	// setup data segment
+	// reload data segment register
 	mov $0x10, %ax
 	mov %ax, %ds
 

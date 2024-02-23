@@ -64,7 +64,8 @@ image.bin: mbr.bin fs.img
 
 kernel.bin: kernel/kernel.o lib/io/printk.o lib/io/panic.o drivers/vga/vga.o \
 	drivers/uart/uart.o drivers/keyboard/keyboard.o cpu/idt/idt.o        \
-	cpu/idt/isr.o cpu/idt/vectors.o lib/mem/kmalloc.o
+	cpu/idt/isr.o cpu/gdt/gdt.o cpu/idt/vectors.o lib/mem/kmalloc.o      \
+	lib/str/memset.o
 	$(LD) $(LDFLAGS) -o $@ -Ttext 0x1000 $^
 
 %.o: %.c

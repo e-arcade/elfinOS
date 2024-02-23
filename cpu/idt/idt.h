@@ -15,16 +15,16 @@
 typedef struct {
   uint16_t low_offset;     // low part of the ISR address
   uint16_t selector;       // point to a valid code seg in GDT
-  uint8_t reserved;        // reserved
-  uint8_t type: 4;         // define the type of the gate
+  uint8_t  reserved;       // reserved
+  uint8_t  type : 4;       // define the type of the gate
                            // 0b0101 (0x5) - Task Gate (offset 0)
                            // 0b0110 (0x6) - 16-bit Interrupt Gate
                            // 0b0111 (0x7) - 16-bit Trap Gate
                            // 0b1110 (0xE) - 32-bit Interrupt Gate
                            // 0b1111 (0xF) - 32-bit Trap Gate
-  uint8_t zero: 1;         // always 0
-  uint8_t dpl:  2;         // CPU privilege level (use INT)
-  uint8_t p:    1;         // set fo the desriptor to be valid
+  uint8_t  zero : 1;       // always 0
+  uint8_t  dpl  : 2;       // CPU privilege level (use INT)
+  uint8_t  p    : 1;       // set fo the desriptor to be valid
   uint16_t high_offset;    // high part of the ISR address
 } __attribute__((packed)) gate_descriptor;
 

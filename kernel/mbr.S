@@ -240,15 +240,15 @@ sectors_per_track:
 	.balign 4
 
 gdt_start:
-	.quad 0x0				      // null descriptor
-	SEG_DESCRIPTOR(STA_X|STA_R, 0x0, 0xffffffff)  // code seg
-	SEG_DESCRIPTOR(STA_W, 0x0, 0xffffffff)        // data seg
+	.quad 0x0			        // null descriptor
+	SEG_ASM(STA_X|STA_R, 0x0, 0xffffffff)   // code seg
+	SEG_ASM(STA_W, 0x0, 0xffffffff)         // data seg
 gdt_end:
 
 // define global descriptor table
 gdt_descriptor:
-	.word gdt_end - gdt_start - 1                 // size (16 bit)
-	.int  gdt_start                               // address (32 bit)
+	.word gdt_end - gdt_start - 1           // size (16 bit)
+	.int  gdt_start                         // address (32 bit)
 
 . = _start + 510     # pad to 510 bytes
 .byte 0x55, 0xaa     # boot sector magic value
