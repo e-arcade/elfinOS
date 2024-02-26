@@ -73,8 +73,8 @@
 // base[31:24] - 00000000 
 
 #define USER_BASE       0x400000  // 4 MB
-#define USER_STACK_BASE 0xf00000  // 15 MB
-#define KERN_STACK_BASE 0x090000
+#define USER_STACK_BASE 0xf00000  // 16 MB
+#define KERN_STACK_BASE 0x090000  // ~ 0.5MB
 
 // The 0xC0 means the limit is in 4096-byte units
 // and (for executable segments) 32-bit mode.

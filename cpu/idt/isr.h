@@ -36,6 +36,7 @@ typedef struct {
 typedef void (*isr_t)(stack_state*);
 
 void interrupt_handler(stack_state* state);
+void syscall_handler(stack_state* state);
 void add_interrupt_handler(uint8_t i, isr_t handler);
 
 #endif /* CPU_IDT_ISR_H */

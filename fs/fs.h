@@ -1,51 +1,56 @@
-#pragma once
+#ifndef FS_FS_H
+#define FS_FS_H
 
 #include <stdint.h>
 
-/* Directory structure:
+/* directory structure:
 
-         32-byte entries
-┌───────────────────────────────┐
-│Reserved                       │
-│char[32]                       │
-├──────┬──────┬────────┬────────┤
-│Offset│Size  │Reserved│Name    │
-│uint32│uint32│uint32  │char[20]│
-├──────┼──────┼────────┼────────┤
-│ ...  │      │        │        │
+   32-byte entries
+   ┌───────────────────────────────┐
+   │Reserved                       │
+   │char[32]                       │
+   ├──────┬──────┬────────┬────────┤
+   │Offset│Size  │Reserved│Name    │
+   │uint32│uint32│uint32  │char[20]│
+   ├──────┼──────┼────────┼────────┤
+   │ ...  │      │        │        │
 
-Offset is in sectors (zero-based),
-size is in bytes, name is 0-terminated.
+   offset is in sectors (zero-based),
+   size is in bytes, name is 0-terminated.
 
 */
 
 enum {
-	sector_size = 512,
-	ents_in_dir = 15,
+  sector_size = 512,  // sector size
+  base_sector = 1,    // number of the fs directory sector relative to which
+                      // offsets of the files will be calculated
+  ents_in_dir = 15,   // the fs can store 15 files
 };
 
-struct dirent {
-	uint32_t offset_sectors;
-	uint32_t size_bytes;
-	uint32_t reserved;
-	char name[20];
-};
+typedef struct {
+  uint32_t offset_sectors;
+  uint32_t size_bytes;
+  uint32_t reserved;
+  char name[20];
+} dirent;
 
-struct dir {
-	char reserved[32];
-	struct dirent entries[ents_in_dir];
-};
+typedef struct {
+  char reserved[32];
+  dirent entries[ents_in_dir];
+} dir;
 
-struct stat {
-	uint32_t size;
-	uint32_t reserved[3];
-};
+typedef struct {
+  uint32_t size;
+  uint32_t reserved[3];
+} stat;
 
-/* Find file by name and fill information in buf.
- * Returns zero on success, nonzero on failure. */
-int stat(const char* name, struct stat *buf);
+/* find file by name and fill information in buf.
+ * returns zero on success, nonzero on failure. */
+int32_t get_stat(const char* name, stat *buf);
 
-/* Find file by name and read it into buffer with size bufsize.
- * At most (bufsize & ~511) bytes will be read.
- * Return number of bytes read or -1 on failure. */
-int read_file(const char* name, void* buf, uint32_t bufsize);
+/* find file by name and read it into buffer with size bufsize.
+ * at most (bufsize & ~511) bytes will be read.
+ * return number of sectors read or -1 on failure. */
+int32_t read_file(const char* name, void* buf, uint32_t buf_size);
+
+#endif /* FS_FS_H */

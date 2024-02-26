@@ -178,14 +178,14 @@ switch_to_32bit:
 	or $1, %eax
 	mov %eax, %cr0
 
-	// cs - 0x1000
+	// cs - KCODE segment descriptor offset (8 bytes) in the GDT
 	// eip - init_32bit address
 	ljmp $SEG_KCODE << 3, $init_32bit
 
 .code32
 init_32bit:
-	// initialize all segments with
-	// .data section address (0x2000)
+	// initialize all segment registers by KDATA
+	// segment descriptor offset (16 bytes) in the GDT
 	mov $SEG_KDATA << 3, %ax
 	mov %ax, %ds
 	mov %ax, %ss
@@ -193,7 +193,7 @@ init_32bit:
 	mov %ax, %fs
 	mov %ax, %gs
 
-	// setup stack
+	// setup stack (0x90000)
 	mov $KERN_STACK_BASE, %ebp
 	mov %ebp, %esp
 

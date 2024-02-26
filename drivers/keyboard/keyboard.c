@@ -17,20 +17,22 @@ char* keyboard_buf;
 unsigned keyboard_buf_size;
 
 void keyboard_handler(stack_state* state) {
-  // 0x60 - default port for keyboard
-  uint8_t code = port_byte_in(0x60);
+  // read "make" code from KBC,
+  // de-assert IRQ1 and reset the IBF (Input Buffer Full) flag
+  uint32_t code = port_byte_in(0x60);
   if (code < sizeof(sc_ascii)) {
     char c = sc_ascii[code];
     if (keyboard_buf_size < keyboard_buf_capacity) {
       keyboard_buf[keyboard_buf_size++] = c;
     }
     char str[] = {c, '\0'};
-    printk(str);
+    printk(str, 's');
   } 
 }
 
 void keyboard_init() {
   keyboard_buf = kmalloc(keyboard_buf_capacity);
-  
+
+  // get request from the first PS/2
   add_interrupt_handler(IRQ1, keyboard_handler);
 }

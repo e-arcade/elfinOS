@@ -51,12 +51,12 @@ debug-nox: image.bin
 		-ex "break _start" \
 		-ex "continue"
 
-fs.img: kernel.bin fs/mkfs
-	fs/mkfs $@ $<
+fs.img: kernel.bin fs/mkfs user/false
+	fs/mkfs $@ $< user/false
 
 LDFLAGS=-m elf_i386
 
-user/%: user/%.o user/crt.o
+user/%: user/%.o user/crt.o lib/io/printk.o drivers/uart/uart.o drivers/vga/vga.o
 	$(LD) $(LDFLAGS) -o $@ -Ttext 0x1000 $^
 
 image.bin: mbr.bin fs.img
@@ -65,7 +65,7 @@ image.bin: mbr.bin fs.img
 kernel.bin: kernel/kernel.o lib/io/printk.o lib/io/panic.o drivers/vga/vga.o \
 	drivers/uart/uart.o drivers/keyboard/keyboard.o cpu/idt/idt.o        \
 	cpu/idt/isr.o cpu/gdt/gdt.o cpu/idt/vectors.o lib/mem/kmalloc.o      \
-	lib/str/memset.o
+	lib/str/str.o drivers/ata/ata.o fs/fs.o kernel/proc.o kernel/swtch.o
 	$(LD) $(LDFLAGS) -o $@ -Ttext 0x1000 $^
 
 %.o: %.c
@@ -81,7 +81,7 @@ mbr.elf: kernel/mbr.o
 	$(LD) $(LDFLAGS) -Ttext=0x7c00 $^ -o $@
 
 clean:
-	rm -f *.elf *.img *.bin *.o */*.o */*/*.o fs/mkfs
+	rm -f *.elf *.img *.bin *.o */*.o */*/*.o fs/mkfs user/false
 
 fs/%: fs/%.c
 	gcc -Wall -Werror -g $^ -o $@

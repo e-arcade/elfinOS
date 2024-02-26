@@ -24,6 +24,7 @@ ret_interrupt_handler:
 	popl %ds
 	// int_num, err_code
 	addl $0x8, %esp
+	// restore cs, eip, eflags, useresp, ss
 	iret	
 
 // each interrupt vector handle interrupt request and call isr

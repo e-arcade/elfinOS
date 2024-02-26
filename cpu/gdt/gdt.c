@@ -8,7 +8,7 @@ void init_gdt() {
   // 0x100000 in kernelspace = 0x100000
   gdt[SEG_KCODE] = SEG(STA_R|STA_X, 0x0, 0xffffffff, 0);
   gdt[SEG_KDATA] = SEG(STA_W, 0x0, 0xffffffff, 0);
-  // 0x100000 in userspace   = 0x100000 + USER_BASE
+  // program entry point in userspace = USER_BASE + entry point address
   gdt[SEG_UCODE] = SEG(STA_R|STA_X, USER_BASE, 0xffffffff - USER_BASE, DPL_USER);
   gdt[SEG_UDATA] = SEG(STA_W, USER_BASE, 0xffffffff - USER_BASE, DPL_USER);
 }
@@ -24,11 +24,12 @@ void load_gdt() {
 }
 
 void install_tss(task_state* tss, void* esp) {
+  // Ensure the TSS is initially zero'd.
+  memset(tss, 0, sizeof(*tss));
+  
   gdt[SEG_TSS] = SEG16(STS_T32A, tss, sizeof(*tss) - 1, 0);
   // seting up system descriptor
   gdt[SEG_TSS].s = 0;
-  // Ensure the TSS is initially zero'd.
-  memset(&tss, 0, sizeof(*tss));
 
   tss->ss0  = SEG_KDATA << 3;
   tss->esp0 = (uint32_t)esp;

@@ -74,5 +74,5 @@ void load_idt() {
 
   init_pic();
 
-  //add_interrupt_handler(SYSCALL_CODE, syscall_handler);
+  add_interrupt_handler(SYSCALL_CODE, syscall_handler);
 }

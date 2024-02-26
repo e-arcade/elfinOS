@@ -2,10 +2,12 @@
 #include "idt.h"
 #include "../../lib/io/io.h"
 #include "../../drivers/port.h"
+#include "../../kernel/syscall.h"
+#include "../../kernel/proc.h"
 
 static isr_t interrupt_handlers[GATE_NUM];
 
-const char* const exception_messages[] = {
+char* const exception_messages[] = {
     [0] = "Division By Zero",
     [1] = "Debug",
     [2] = "Non Maskable Interrupt",
@@ -31,27 +33,47 @@ const char* const exception_messages[] = {
 
 void interrupt_handler(stack_state* state) {
   uint8_t num = state->int_num;
+    
+  // send EOI (end of interrupt) to PIC
+  if (num >= 40) {
+    // follower
+    port_byte_out(0xA0, 0x20);
+  }
+  if (num >= 32) {
+    // leader
+    port_byte_out(0x20, 0x20);
+  }
+  
+  // handle interrupt
+  if (interrupt_handlers[num] != 0) {
+    isr_t handler = interrupt_handlers[num];
+    handler(state);
+    return;
+  }
   
   // handle trap
   if (num < 32) {
-    const char* msg = "reserved";
+    char* msg = "reserved";
     if (num < ARRLEN(exception_messages)) {
       msg = exception_messages[num];
     }
     panic(msg);
   }
-  // handle interrupt
-  if (interrupt_handlers[num] != 0) {
-    isr_t handler = interrupt_handlers[num];
-    handler(state);
-  }
+}
 
-  // EOI
-  if (num >= 40) {
-    port_byte_out(0xA0, 0x20); /* follower */
-  }
-  if (num >= 32) {
-    port_byte_out(0x20, 0x20); /* leader */
+void syscall_handler(stack_state* state) {
+  // get handler result
+  switch(state->eax) {
+  case SYS_exit:
+    if (state->ebx == 0) {
+      printk("* success\n", 's');
+    } else {
+      printk("* failure\n", 's');
+    }
+    killproc();
+  default:
+    printk("unknown syscall!", 's');
+    state->eax = -1;
   }
 }
 
